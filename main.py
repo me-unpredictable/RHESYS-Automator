@@ -1,17 +1,31 @@
 import time
 import tkinter as tk
+from tkinter import filedialog as of
 import pyautogui as ui
+import keyboard as kb
 import os
+import pandas as pd
 
 
-#wb=webdriver.Ie('IEDriverServer.exe')
-
-import tkinter.ttk
 
 #variables
-title='Oracle Fusion Middleware Forms Services - WebUtil - Internet Explorer'
-s_width=0
-s_height=0
+title='Oracle Fusion Middleware Forms Services - WebUtil - I' # full name is internet explorer, but when
+w_title= 'RHESYS Automator v1.0' # This variable contains windows title
+uid=pwd=''
+
+
+#citix is ued full name is not shown in citrix Ie. To support citrix title needs to be till I.
+# if we end title earlier then it can take anyother browser as main browser
+# to make sure we are opening Internet explorer, title has to finish on I.
+
+# get screen size
+s_info= tk.Tk()
+s_info.update_idletasks()
+s_width=s_info.winfo_screenwidth()
+s_height=s_info.winfo_screenheight()
+s_info.destroy()
+
+
 
 # ----------------------------------------------
 # main ui functions
@@ -28,20 +42,28 @@ def launch_ie(): #function to launch internet explorer
 
 def login_(uid,pwd): # this function is to perfrom login
     # get cursor to first field (safety)
-    ui.hotkey('ctrl','up')
+    #ui.hotkey('ctrl', 'up')
+    kb.send('ctrl+up')
     # type user id
     ui.typewrite(uid)
+    ui.sleep(0.1)
     # move to next field
-    ui.hotkey('tab')
+    kb.send('tab')
+    ui.sleep(0.1)
     # type password
     ui.typewrite(pwd)
+    ui.sleep(0.1)
     # login
-    ui.hotkey('tab')
+    kb.send('tab')
 
 def check(win):
     titles = ui.getAllTitles()
     # check if orcale fussion is opened or not
-    if title not in titles:
+    err=True # assume that our app is not opened
+    for t_list in titles:
+        if title in t_list:
+            err=False
+    if err:
         print(titles)
         ui.alert('Please try again after opening RHESYS page in internet explorer')
     else:
@@ -55,6 +77,7 @@ def show_win(title): # function to activate ie window
     # it will activate ie window
     ui.getWindowsWithTitle(title)[0].activate()
     ui.getWindowsWithTitle(title)[0].maximize()
+    ui.sleep(0.1)
 
 def switch(title,uid,pwd): # this function is to bring RHESYS windows in forground
     ui.getWindowsWithTitle(title)[0].activate()
@@ -70,28 +93,95 @@ def switch(title,uid,pwd): # this function is to bring RHESYS windows in forgrou
 
 def new_project(): # thi function is to create new project entry
     show_win(title) # get ie window
-    ui.hotkey('alt')
-    ui.hotkey('p')
-    ui.sleep(0.2)
-    ui.hotkey('p')
+    kb.send('alt')
+    kb.send('p')
+    ui.sleep(0.3)
+    kb.send('p')
 
+def get_data(window,f_path): # This function reads excel file data
+    data=pd.read_excel(f_path) # open excel file
+    cols=data.shape[1] # get number of columns
+    # this feature will prevent user from selecting wrong file
+    if cols<81:
+        ui.alert('Wrong File, Try again',title=w_title)
+        window.destroy() # destroy main window
+        main_win() # reopen main window
 
+    return data
 
+def fill_project(): # this function fills information in project sub tab
+    prject_title=''
+
+def ui_more(): # this function finds the location of button more and click on it
+    show_win(title)
+    loc=ui.locateOnScreen('img/btn_more.png')
+    ui.scroll(10)
+    ui.click(loc[0]+3,loc[1]+3)
+def ui_c_cmnt(): # this function finds the location of button more and click on it
+    show_win(title)
+    ui.scroll(10)
+    loc=ui.locateOnScreen('img/btn_c_comments.png')
+    ui.click(loc[0]+3,loc[1]+3)
+def ui_grants(): # this function finds the location of button more and click on it
+    show_win(title)
+    ui.scroll(-10)
+    loc=ui.locateOnScreen('img/btn_grants.png')
+    ui.click(loc[0]+3,loc[1]+3)
+def ui_comments(): # this function finds the location of button more and click on it
+    show_win(title)
+    ui.scroll(-10)
+    loc=ui.locateOnScreen('img/btn_comments.png')
+    ui.click(loc[0]+3,loc[1]+3)
+def ui_ua(): # this function finds the location of button more and click on it
+    show_win(title)
+
+    ui.scroll(20)
+    loc=ui.locateOnScreen('img/btn_user_action.png')
+    ui.click(loc[0]+3,loc[1]+3)
+def ui_status(): # this function finds the location of button more and click on it
+    show_win(title)
+    ui.scroll(-10)
+    loc=ui.locateOnScreen('img/btn_status.png')
+    ui.click(loc[0]+3,loc[1]+3)
+def ui_forms(): # this function finds the location of button more and click on it
+    show_win(title)
+    ui.scroll(-10)
+    loc=ui.locateOnScreen('img/btn_forms.png')
+    ui.click(loc[0]+3,loc[1]+3)
+def ui_keywords(): # this function finds the location of button more and click on it
+    show_win(title)
+    ui.scroll(-10)
+    loc=ui.locateOnScreen('img/btn_keyword.png')
+    ui.click(loc[0]+3,loc[1]+3)
+def ui_links(): # this function finds the location of button more and click on it
+    show_win(title)
+    ui.scroll(-10)
+    loc=ui.locateOnScreen('img/btn_links.png')
+    ui.click(loc[0]+3,loc[1]+3)
+def ui_save(): # this function finds the location of button more and click on it
+    show_win(title)
+    ui.scroll(-10)
+    loc=ui.locateOnScreen('img/btn_save.png')
+    ui.click(loc[0]+3,loc[1]+3)
+def ui_exit(): # this function finds the location of button more and click on it
+    show_win(title)
+    ui.scroll(-10)
+    loc=ui.locateOnScreen('img/btn_exit.png')
+    ui.click(loc[0]+3,loc[1]+3)
+def s_test(s):
+    time.sleep(1)
+    ui.scroll(s)
 # ----------------------------------------------
 # windows/ gui
 # ----------------------------------------------
 
 def login_win():
-    global uid
-    global pwd
+    global uid,pwd
     # login window creation
     login=tk.Tk()
     login.title('Login. . .')
     login.resizable(0,0)
-    #get screen size
-    s_width=login.winfo_screenwidth()
-    s_height=login.winfo_screenheight()
-    print(s_width,s_height)
+
 
     login.geometry("+%s"%(s_width-110)+"-%s"%(s_height-130))
     login.protocol('WM_DELETE_WINDOW',lambda : ui.alert('Click on exit'))
@@ -103,27 +193,60 @@ def login_win():
     pwd=tk.Entry(login,textvariable=p_wd,show='*',width=15).grid(row=1,column=1)
     login_btn=tk.Button(login,text='Login',command=lambda :check(login)).grid(row=2,column=1)
     exit_btn=tk.Button(login,text='Exit',command=lambda :exit(0)).grid(row=3,column=1)
-    tk.mainloop() # main loop for login window
+    uid = u_id.get()
+    pwd = p_wd.get()
+    switch(title, uid, pwd)
+    login.mainloop() # main loop for login window
 
-    uid=u_id.get()
-    pwd=p_wd.get()
-    switch(title,uid,pwd)
+
+
 #-------------------------------------
 def main_win():
+    rnum=0
     # creation of control window
     control=tk.Tk()
-    control.title('Testing')
-    control.geometry("+%s"%(s_width-110)+"-%s"%(s_height-130))
+    control.title(w_title)
+    control.geometry("+%s"%(s_width-130)+"-%s"%(s_height-450))
     control.protocol('WM_DELETE_WINDOW',lambda : ui.alert('Click on exit'))
     control.resizable(0,0)
-    #space=tk.Label().grid(row=0,column=1,padx=15)
-    btn1=tk.Button(text='Switch',command=lambda :switch(title,uid,pwd)).grid(row=1,column=1)
+
+    # ask for the file name
+    ftypes=(
+        ('Excel Workbook', '*.xlsx'),
+        ('Excel 97- Excel 2003 Workbook', '*.xls')
+    )
+    file=of.askopenfilename(title='Select Share point Excel File',
+                            filetypes=ftypes
+                            )
+    if file=='':
+        ui.alert('You didn\'t selecte a file, exiting...', title=w_title)
+        exit(0)
+    data=get_data(control,file)
+    print(data['Project title'][rnum])
+    #exit(0)
+    c_record=tk.Label(text='Current Record #%d'%rnum).grid(row=0,column=1,)
+    btn1=tk.Button(text='New Project',command=new_project).grid(row=1,column=1)
     btn2=tk.Button(text='New',command= new_project).grid(row=2,column=1)
-    exit_btn=tk.Button(control,text='Exit',command=lambda :exit(0)).grid(row=3,column=1)
+    btn_next=tk.Button(text='Next Record',command=lambda : (sum(rnum,1),print(rnum) )).grid(row=3,column=1)
+    btn_more=tk.Button(text='More',command=ui_more).grid(row=4,column=1)
+    btn_c_cmnt = tk.Button(text='Contract Comments', command=ui_c_cmnt).grid(row=5, column=1)
+    btn_grants = tk.Button(text='Grants', command=ui_grants).grid(row=6, column=1)
+    btn_cmnt = tk.Button(text='Comments', command=ui_comments).grid(row=7, column=1)
+    btn_ua = tk.Button(text='User Actions', command=ui_ua).grid(row=8, column=1)
+    btn_sta = tk.Button(text='Status', command=ui_status).grid(row=9, column=1)
+    btn_forms = tk.Button(text='Forms', command=ui_forms).grid(row=10, column=1)
+    btn_kw = tk.Button(text='Keywords', command=ui_keywords).grid(row=11, column=1)
+    btn_links = tk.Button(text='Links', command=ui_links).grid(row=12, column=1)
+    btn_save = tk.Button(text='Save', command=ui_save).grid(row=13, column=1)
+    btn_exit = tk.Button(text='Exit Form', command=ui_exit).grid(row=14, column=1)
+    exit_btn=tk.Button(text='Close',command=lambda :exit(0)).grid(row=15,column=1)
     # configuration to keep control window always on top
     control.attributes('-topmost',True)
-    control.update()
-    tk.mainloop()
+    #control.update()
+    control.mainloop()
     print('Good bye')
 
-login_win()
+#login_win()
+#get_data()
+#main_win()
+s_test(-1000)
