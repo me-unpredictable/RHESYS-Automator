@@ -1,3 +1,4 @@
+import sys
 import time
 import tkinter as tk
 from tkinter import filedialog as of
@@ -30,6 +31,9 @@ s_info.destroy()
 # ----------------------------------------------
 # main ui functions
 # ----------------------------------------------
+def shut():
+    sys.exit()
+    exit(0)
 def launch_ie(): #function to launch internet explorer
     # note: if internet explorer is launched using this function then it will be closed when clos this script/program
     # currently it is unused
@@ -78,6 +82,7 @@ def show_win(title): # function to activate ie window
     ui.getWindowsWithTitle(title)[0].activate()
     ui.getWindowsWithTitle(title)[0].maximize()
     ui.sleep(0.1)
+    ui.moveTo(s_width/2,s_height/2)
 
 def switch(title,uid,pwd): # this function is to bring RHESYS windows in forground
     ui.getWindowsWithTitle(title)[0].activate()
@@ -114,63 +119,60 @@ def fill_project(): # this function fills information in project sub tab
 
 def ui_more(): # this function finds the location of button more and click on it
     show_win(title)
-    loc=ui.locateOnScreen('img/btn_more.png')
-    ui.scroll(10)
+    ui.scroll(1000)
+    loc = ui.locateOnScreen('img/btn_more.png')
     ui.click(loc[0]+3,loc[1]+3)
 def ui_c_cmnt(): # this function finds the location of button more and click on it
     show_win(title)
-    ui.scroll(10)
+    ui.scroll(1000)
     loc=ui.locateOnScreen('img/btn_c_comments.png')
     ui.click(loc[0]+3,loc[1]+3)
 def ui_grants(): # this function finds the location of button more and click on it
     show_win(title)
-    ui.scroll(-10)
+    ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_grants.png')
     ui.click(loc[0]+3,loc[1]+3)
 def ui_comments(): # this function finds the location of button more and click on it
     show_win(title)
-    ui.scroll(-10)
+    ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_comments.png')
     ui.click(loc[0]+3,loc[1]+3)
 def ui_ua(): # this function finds the location of button more and click on it
     show_win(title)
-
-    ui.scroll(20)
+    ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_user_action.png')
     ui.click(loc[0]+3,loc[1]+3)
 def ui_status(): # this function finds the location of button more and click on it
     show_win(title)
-    ui.scroll(-10)
+    ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_status.png')
     ui.click(loc[0]+3,loc[1]+3)
 def ui_forms(): # this function finds the location of button more and click on it
     show_win(title)
-    ui.scroll(-10)
+    ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_forms.png')
     ui.click(loc[0]+3,loc[1]+3)
 def ui_keywords(): # this function finds the location of button more and click on it
     show_win(title)
-    ui.scroll(-10)
+    ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_keyword.png')
     ui.click(loc[0]+3,loc[1]+3)
 def ui_links(): # this function finds the location of button more and click on it
     show_win(title)
-    ui.scroll(-10)
+    ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_links.png')
     ui.click(loc[0]+3,loc[1]+3)
 def ui_save(): # this function finds the location of button more and click on it
     show_win(title)
-    ui.scroll(-10)
+    ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_save.png')
     ui.click(loc[0]+3,loc[1]+3)
 def ui_exit(): # this function finds the location of button more and click on it
     show_win(title)
-    ui.scroll(-10)
+    ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_exit.png')
     ui.click(loc[0]+3,loc[1]+3)
-def s_test(s):
-    time.sleep(1)
-    ui.scroll(s)
+
 # ----------------------------------------------
 # windows/ gui
 # ----------------------------------------------
@@ -222,7 +224,7 @@ def main_win():
         ui.alert('You didn\'t selecte a file, exiting...', title=w_title)
         exit(0)
     data=get_data(control,file)
-    print(data['Project title'][rnum])
+    #print(data['Project title'][rnum])
     #exit(0)
     c_record=tk.Label(text='Current Record #%d'%rnum).grid(row=0,column=1,)
     btn1=tk.Button(text='New Project',command=new_project).grid(row=1,column=1)
@@ -239,14 +241,14 @@ def main_win():
     btn_links = tk.Button(text='Links', command=ui_links).grid(row=12, column=1)
     btn_save = tk.Button(text='Save', command=ui_save).grid(row=13, column=1)
     btn_exit = tk.Button(text='Exit Form', command=ui_exit).grid(row=14, column=1)
-    exit_btn=tk.Button(text='Close',command=lambda :exit(0)).grid(row=15,column=1)
+    exit_btn=tk.Button(text='Close',command=shut).grid(row=15,column=1)
     # configuration to keep control window always on top
     control.attributes('-topmost',True)
     #control.update()
     control.mainloop()
-    print('Good bye')
+    #print('Good bye')
 
 #login_win()
 #get_data()
-#main_win()
-s_test(-1000)
+main_win()
+#s_test(-1000)
