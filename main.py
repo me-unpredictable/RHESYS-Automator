@@ -18,7 +18,7 @@ w_title= 'RHESYS Automator v1.0' # This variable contains windows title
 uid=pwd=''
 rnum=0 # record number
 delay=3
-
+img_pro_link=''#img/process.png'
 #citix is ued full name is not shown in citrix Ie. To support citrix title needs to be till I.
 # if we end title earlier then it can take anyother browser as main browser
 # to make sure we are opening Internet explorer, title has to finish on I.
@@ -65,6 +65,7 @@ def login_(uid,pwd): # this function is to perfrom login
     kb.send('tab')
 
 def check(win):
+    print('Checking windows in all window list')
     titles = ui.getAllTitles()
     # check if orcale fussion is opened or not
     err=True # assume that our app is not opened
@@ -74,24 +75,42 @@ def check(win):
     if err:
         print(titles)
         ui.alert('Please try again after opening RHESYS page in internet explorer')
+    '''
+    # this part is to bring window on the main screen
     else:
+        ui.getWindowsWithTitle(title)[0].moveTo(s_width,
+                                                s_height)  # move ie window to main screen to avoid problem finding in second screen
+        ui.sleep(0.3)'''
+    '''else:
         # check if id and password are entered or not
         if uid!='' and pwd!='':
             tk.Tk.destroy(win)
         else:
-            ui.alert('Please Enter User Id and Password')
+            ui.alert('Please Enter User Id and Password')'''
 def show_win(title): # function to activate ie window
+    print('Show win')
     # this function needs to be called everytime after clicking on any button
     # it will activate ie window
     # note: make sure automator and Ie are on same screen
-    win_loc=ui.getWindowsWithTitle(title)[0].size
-    print(win_loc[0],win_loc[1])
 
+    '''x=ui.getWindowsWithTitle(title)[0].centerx
+    y=ui.getWindowsWithTitle(title)[0].centery
+    if s_width-x>s_width or s_height-y>s_height or s_width-x<0 or s_height-y<0:
+        ui.alert('Move IE and Automator to main window',title=w_title)'''
+
+    # else:
+    # ------------------------------------
+    # need to work on moving window back to main screen till then make sure that window and automator are in
+    # same screen
+    #ui.getWindowsWithTitle(title)[0].moveTo(s_width,
+    #                                        s_height)  # move ie window to main screen to avoid problem finding in second screen
+    # -------------------------------------
     ui.getWindowsWithTitle(title)[0].activate()
     ui.getWindowsWithTitle(title)[0].maximize()
+    ui.getWindowsWithTitle(title)[0].activate()
     ui.sleep(0.1)
-    ui.moveTo(s_width/2,s_height/2)
-
+    ui.moveTo(s_width/2,s_height/2) # move mouse to center of the screen
+    ui.sleep(0.3)
 
 def switch(title,uid,pwd): # this function is to bring RHESYS windows in forground
     ui.getWindowsWithTitle(title)[0].activate()
@@ -142,7 +161,7 @@ def fill_prj_tile(data): # this function fills information in project sub tab
     print(data['Project title'][rnum])
     show_win(title)
     ui.scroll(1000) # positive value to scroll up
-    loc=ui.locateOnScreen('img/pr_title.png',grayscale=True,confidence=0.5)
+    loc=ui.locateOnScreen('img/pr_title.png',grayscale=False,confidence=0.8)
     if loc==None:
         error_loc()
     else:
@@ -150,10 +169,10 @@ def fill_prj_tile(data): # this function fills information in project sub tab
         kb.write(data['Project title'][rnum])
     ui.sleep(delay)
 def fill_prj_des(data): # this function fills information in project sub tab
-    print('Writing description.')
     show_win(title)
+    print('Writing description.')
     ui.scroll(1000)
-    loc = ui.locateOnScreen('img/pr_des.png',grayscale=True,confidence=0.5)
+    loc = ui.locateOnScreen('img/pr_des.png',grayscale=False,confidence=0.8)
     if loc==None:
         error_loc()
     else:
@@ -164,22 +183,27 @@ def fill_start(data): # this function fills information in project sub tab
     print('Writing Start date.')
     show_win(title)
     ui.scroll(1000)
-    loc = ui.locateOnScreen('img/pr_start.png',grayscale=True,confidence=0.5)
+    loc = ui.locateOnScreen('img/pr_start.png',grayscale=False,confidence=0.8)
     if loc==None:
         error_loc()
     else:
         ui.click(loc[0] + 100, loc[1] + 10)
         sd=str(data['Start date'][rnum]).split(' ')[0]
+
         # convert date from yymmdd to ddmmyy
         sd=sd.split('-')
-        sd=sd[2]+'/'+sd[1]+'/'+sd[0]
-        kb.write(sd)
+        # check whether data is there in the data or not
+        if len(sd)<=1:
+            ui.alert('Project Start Date not found fill it manually.',title=w_title)
+        else:
+            sd=sd[2]+'/'+sd[1]+'/'+sd[0]
+            kb.write(sd)
     ui.sleep(delay)
 def fill_fin(data): # this function fills information in project sub tab
     print('Writing finish date.')
     show_win(title)
     ui.scroll(1000)
-    loc = ui.locateOnScreen('img/pr_fin.png',grayscale=True,confidence=0.5)
+    loc = ui.locateOnScreen('img/pr_fin.png',grayscale=False,confidence=0.8)
     if loc==None:
         error_loc()
     else:
@@ -187,27 +211,35 @@ def fill_fin(data): # this function fills information in project sub tab
         ed = str(data['End date'][rnum]).split(' ')[0]
         # convert date from yymmdd to ddmmyy
         ed = ed.split('-')
-        ed = ed[2] + '/' + ed[1] + '/' + ed[0]
-        kb.write(ed)
+        # check whether data was there in the data or not
+        if len(ed)<=1:
+            ui.alert('Project Finish Date not found fill it manually.',title=w_title)
+        else:
+            ed = ed[2] + '/' + ed[1] + '/' + ed[0]
+            kb.write(ed)
     ui.sleep(delay)
 def fill_res(data):
     print('Writing research%.')
     show_win(title)
     ui.scroll(1000)
-    loc = ui.locateOnScreen('img/res_per.png',grayscale=True,confidence=0.5)
+    loc = ui.locateOnScreen('img/res_per.png',grayscale=False,confidence=0.9)
     if loc==None:
         error_loc()
     else:
         ui.click(loc[0] + 100, loc[1] + 10)
         r_per=str(data['% Research'][rnum])
-        #
-        kb.write(r_per)
+        # check if it is a number or not
+        print('rpr:',r_per)
+        if not (r_per=='nan'):
+            kb.write(r_per)
+        else:
+            ui.alert('Research Percentage not found fill it manually.',w_title)
     ui.sleep(delay)
 def fill_overheads(data):
     print('Writing levy.')
     show_win(title)
     ui.scroll(1000)
-    loc = ui.locateOnScreen('img/levy.png',grayscale=True,confidence=0.5)
+    loc = ui.locateOnScreen('img/levy.png',grayscale=False,confidence=0.8)
     if loc==None:
         error_loc()
     else:
@@ -219,7 +251,7 @@ def fill_ip_owner(data):
     print('Writing Ip owner.')
     show_win(title)
     ui.scroll(1000)
-    loc = ui.locateOnScreen('img/ip_owner.png',grayscale=True,confidence=0.5)
+    loc = ui.locateOnScreen('img/ip_owner.png',grayscale=False,confidence=0.8)
     if loc==None:
         error_loc()
     else:
@@ -246,7 +278,7 @@ def fill_school(data):
     show_win(title)
     # scroll down
     ui.scroll(-1000)
-    loc = ui.locateOnScreen('img/nos.png',grayscale=True,confidence=0.6)  # find field
+    loc = ui.locateOnScreen('img/nos.png',grayscale=False,confidence=0.8)  # find field
     if loc==None:
         error_loc()
     else:
@@ -283,11 +315,11 @@ def fill_cheif_in(data,btn): # double check everyting (it takes more button as a
     show_win(title)
     ui.scroll(1000)
     ui.sleep(delay)
-    loc = ui.locateOnScreen('img/c_cin.png',grayscale=True,confidence=0.5) # find field
+    loc = ui.locateOnScreen('img/c_cin.png',grayscale=False,confidence=0.8) # find field
     if loc==None:
         error_loc()
     else:
-        ui.click(loc[0] + 10, loc[1] + 20) # click on it
+        ui.click(loc[0] + 15, loc[1] + 25) # click on it
         # erase if anything is written (here we can not use erase text function this field is different)
         ui.sleep(2)
         kb.write('123')
@@ -296,7 +328,7 @@ def fill_cheif_in(data,btn): # double check everyting (it takes more button as a
         kb.write('%')
         kb.send('enter') # search in full list
         ui.sleep(delay+1)
-        loc = ui.locateOnScreen('img/find.png',grayscale=True,confidence=0.5)  # find field
+        loc = ui.locateOnScreen('img/find.png',grayscale=False,confidence=0.8)  # find field
         if loc==None:
             error_loc()
         else:
@@ -322,31 +354,69 @@ def fill_cheif_in(data,btn): # double check everyting (it takes more button as a
                 ui.sleep(delay)
                 # click on more
                 ui.scroll(1000)
-                loc = ui.locateOnScreen('img/btn_more.png',grayscale=True,confidence=0.5)  # find field
-                ui.click(loc[0] + 10, loc[1] + 10)  # click on it
-                ui.alert('There are more than one researchers!!\nClick on Fill More once more researcher window is opened.',w_title)
+                loc = ui.locateOnScreen('img/btn_more.png',grayscale=False,confidence=0.8)  # find field
+                if loc == None:
+                    error_loc()
+                else:
+                    ui.click(loc[0] + 10, loc[1] + 10)  # click on it
+                    ui.alert('There are more than one researchers!!\nClick on Fill More once more researcher window is opened.',w_title)
     ui.sleep(delay)
+
 def fill_more(data,btn):
     print('Writing more CI data.123'
           '%'
           '')
     show_win(title)
+    r_names = str(data['Researcher name'][rnum]).split(';')
+    r_names = ''.join(r_names).split('#')
+    r_name = []
+    for i in r_names:
+        if not (i.isnumeric()):
+            r_name.append(i)  # add all researcher names to r_name
     btn['state']='disabled' # once fill more is used disable it again
+    for res_index in range(1,len(r_name)):
+        kb.send('ctrl+down')
+        # erase if anything is written (here we can not use erase text function this field is different)
+        ui.sleep(2)
+        kb.write('123')
+        kb.send('enter')
+        # now everything is erased
+        kb.write('%')
+        kb.send('enter')  # search in full list
+        ui.sleep(delay + 1)
+        loc = ui.locateOnScreen('img/find.png', grayscale=False, confidence=0.8)  # find field
+        if loc == None:
+            error_loc()
+        else:
+            ui.click(loc[0] + 100, loc[1] + 10)  # click on it
+            erase_txt()
 
-
+            name = r_name[res_index].split(' ')  # divide first name and last name
+            kb.write(name[1] + '%' + name[0])  # write lastname % first name
+            kb.send('enter')
+            ui.sleep(delay)
+            # keeping fixed position of Investigator for now
+            # change it on further instruction
+            kb.write('Investigator')
+    ui.sleep(delay)
+    # save record
+    ui_save()
+    # exit current window
+    #ui_exit()
 def fill_project(data,btn):
-    #fill_prj_tile(data)
-    fill_prj_des(data)
-    #fill_start(data)
-    #fill_fin(data)
-    #fill_res(data)
-    #fill_overheads(data)
-    #fill_ip_owner(data) #no data
-    #fill_rdo_bdo(data) #nodata
-    #fill_cheif_in(data,btn)
+    print('-----------------------')
+    fill_prj_tile(data) # checked
+    fill_prj_des(data) # chekced
+    fill_start(data) # checked
+    fill_fin(data) # checked
+    fill_res(data) # checked
+    #fill_overheads(data) # in meeting with Alison we decided not to fill it
+    #fill_ip_owner(data) # no data (blank meeting)
+    #fill_rdo_bdo(data) # no data (blank meeting)
+    fill_cheif_in(data,btn) # checked
+    #fill_more(data,btn) # only for testing
     #fill_start_date()
     #fill_school(data)
-    pass
 #--------------------------------------------------------------
 def next_record(lbl): # This function will read next record
     global rnum
@@ -356,57 +426,90 @@ def ui_more(): # this function finds the location of button more and click on it
     show_win(title)
     ui.scroll(1000)
     loc = ui.locateOnScreen('img/btn_more.png',grayscale=True,confidence=0.5)
-    ui.click(loc[0]+3,loc[1]+3)
+    if loc == None:
+        error_loc()
+    else:
+        ui.click(loc[0]+3,loc[1]+3)
 def ui_c_cmnt(): # this function finds the location of button more and click on it
     show_win(title)
     ui.scroll(1000)
     loc=ui.locateOnScreen('img/btn_c_comments.png',grayscale=True,confidence=0.5)
-    ui.click(loc[0]+3,loc[1]+3)
+    if loc == None:
+        error_loc()
+    else:
+        ui.click(loc[0]+3,loc[1]+3)
 def ui_grants(): # this function finds the location of button more and click on it
     show_win(title)
     ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_grants.png',grayscale=True,confidence=0.5)
-    ui.click(loc[0]+3,loc[1]+3)
+    if loc == None:
+        error_loc()
+    else:
+        ui.click(loc[0]+3,loc[1]+3)
 def ui_comments(): # this function finds the location of button more and click on it
     show_win(title)
     ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_comments.png',grayscale=True,confidence=0.5)
-    ui.click(loc[0]+3,loc[1]+3)
+    if loc == None:
+        error_loc()
+    else:
+        ui.click(loc[0]+3,loc[1]+3)
 def ui_ua(): # this function finds the location of button more and click on it
     show_win(title)
     ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_user_action.png',grayscale=True,confidence=0.5)
-    ui.click(loc[0]+3,loc[1]+3)
+    if loc == None:
+        error_loc()
+    else:
+        ui.click(loc[0]+3,loc[1]+3)
 def ui_status(): # this function finds the location of button more and click on it
     show_win(title)
     ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_status.png',grayscale=True,confidence=0.5)
-    ui.click(loc[0]+3,loc[1]+3)
+    if loc == None:
+        error_loc()
+    else:
+        ui.click(loc[0]+3,loc[1]+3)
 def ui_forms(): # this function finds the location of button more and click on it
     show_win(title)
     ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_forms.png',grayscale=True,confidence=0.5)
-    ui.click(loc[0]+3,loc[1]+3)
+    if loc == None:
+        error_loc()
+    else:
+        ui.click(loc[0]+3,loc[1]+3)
 def ui_keywords(): # this function finds the location of button more and click on it
     show_win(title)
     ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_keyword.png',grayscale=True,confidence=0.5)
-    ui.click(loc[0]+3,loc[1]+3)
+    if loc == None:
+        error_loc()
+    else:
+        ui.click(loc[0]+3,loc[1]+3)
 def ui_links(): # this function finds the location of button more and click on it
     show_win(title)
     ui.scroll(-1000)
     loc=ui.locateOnScreen('img/btn_links.png',grayscale=True,confidence=0.5)
-    ui.click(loc[0]+3,loc[1]+3)
+    if loc == None:
+        error_loc()
+    else:
+        ui.click(loc[0]+3,loc[1]+3)
 def ui_save(): # this function finds the location of button more and click on it
     show_win(title)
     ui.scroll(-1000)
-    loc=ui.locateOnScreen('img/btn_save.png',grayscale=True,confidence=0.5)
-    ui.click(loc[0]+3,loc[1]+3)
+    loc=ui.locateOnScreen('img/btn_save.png',grayscale=False,confidence=0.8)
+    if loc == None:
+        error_loc()
+    else:
+        ui.click(loc[0]+6,loc[1]+6)
 def ui_exit(): # this function finds the location of button more and click on it
     show_win(title)
     ui.scroll(-1000)
-    loc=ui.locateOnScreen('img/btn_exit.png',grayscale=True,confidence=0.5)
-    ui.click(loc[0]+3,loc[1]+3)
+    loc=ui.locateOnScreen('img/btn_exit.png',grayscale=False,confidence=0.8)
+    if loc == None:
+        error_loc()
+    else:
+        ui.click(loc[0]+6,loc[1]+6)
 
 # ----------------------------------------------
 # windows/ gui
@@ -440,11 +543,13 @@ def login_win():
 #-------------------------------------
 def main_win():
     global rnum
-    #rnum=0
+    # check if RHESYS is opend or not
+    check(title)
+    # rnum=0
     # creation of control window
     control=tk.Tk()
     control.title(w_title)
-    control.geometry("+%s"%(s_width-250)+"-%s"%(s_height-380))
+    control.geometry("+%s"%(s_width-270)+"-%s"%(s_height-380))
     control.protocol('WM_DELETE_WINDOW',lambda : ui.alert('Click on exit'))
     control.resizable(0,0)
 
@@ -490,12 +595,27 @@ def main_win():
     #btn1=tk.Button(lbl_frame1,text='New Project',command=new_project).grid(row=0,column=0)
     #btn_next=tk.Button(lbl_frame1,text='Next Record',command=lambda: next_record(control)).grid(row=1,column=0)
 
+    # showing processing icon
+    img_pro=tk.PhotoImage(file='img/process.png')
+    pro_img=tk.Label(control,image='',text='Ready',compound=tk.TOP)
+    pro_img.grid(row=0, column=1)
+
+    # -------
     lbl_frame2=tk.LabelFrame(control,text='Fill Data')
     lbl_frame2.grid(row=1,column=0)
     btn_fill_more = tk.Button(lbl_frame2,state='disabled', text='Fill More', command=lambda: fill_more(data,btn_fill_more))
     btn_fill_more.grid(row=0, column=1) # here we need to put this button separately into grid because we are using it
     # as an argument
-    btn_fill_pro=tk.Button(lbl_frame2,text='Fill Project',command=lambda: fill_project(data,btn_fill_more)).grid(row=0,column=0)
+    # show processing icon
+    def start_filling():
+        pro_img['image']=img_pro
+        pro_img['text']='Please wait...'
+        control.update()
+        fill_project(data, btn_fill_more)
+        pro_img['image']=''
+        pro_img['text'] = 'Ready'
+        control.update()
+    btn_fill_pro=tk.Button(lbl_frame2,text='Fill Project',command=start_filling).grid(row=0,column=0)
 
 
     #btn_title = tk.Button(lbl_frame2, text='Prj title', command=lambda: fill_prj_tile(data)).grid(row=0, column=0)
@@ -523,16 +643,6 @@ def main_win():
     control.mainloop()
     #print('Good bye')
 
-#login_win()
-#get_data()
-#print(kb._canonical_names.canonical_names)
-#main_win()
-#s_test(-1000)
-#left="-1718",', 'top="-10"
-#left="317",', 'top="76"
 
-#ui.moveTo(1728,)
-ctypes.windll.user32.SetCursorPos(1728, 930)
-#ui.FAILSAFE=False
-#ui.click()
+main_win()
 #show_win(title)
